@@ -64,6 +64,7 @@ namespace Mango.Services.ProductAPI.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public ResponseDto Post([FromBody] RequestDto obj)
         {
             try
@@ -82,6 +83,7 @@ namespace Mango.Services.ProductAPI.Controllers
             }
         }
         [HttpPut]
+        [Authorize(Roles = "ADMIN")]
         public ResponseDto Put([FromBody] ProductDto obj)
         {
             try
@@ -101,6 +103,7 @@ namespace Mango.Services.ProductAPI.Controllers
         }
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "ADMIN")]
         public ResponseDto Delete(Guid id)
         {
             try
