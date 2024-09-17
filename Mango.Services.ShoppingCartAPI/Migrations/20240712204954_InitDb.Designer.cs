@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mango.Services.ShoppingCartAPI.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20240711033621_addshoppingcatrtables")]
-    partial class addshoppingcatrtables
+    [Migration("20240712204954_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,12 +27,14 @@ namespace Mango.Services.ShoppingCartAPI.Migrations
 
             modelBuilder.Entity("Mango.Services.ShoppingCartAPI.Models.CartDetail", b =>
                 {
-                    b.Property<Guid>("CartDetailsId")
+                    b.Property<int>("CartDetailsId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("CartHeaderId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartDetailsId"));
+
+                    b.Property<int>("CartHeaderId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Count")
                         .HasColumnType("int");
@@ -49,9 +51,11 @@ namespace Mango.Services.ShoppingCartAPI.Migrations
 
             modelBuilder.Entity("Mango.Services.ShoppingCartAPI.Models.CartHeader", b =>
                 {
-                    b.Property<Guid>("CartHeaderId")
+                    b.Property<int>("CartHeaderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartHeaderId"));
 
                     b.Property<string>("CouponCode")
                         .HasColumnType("nvarchar(max)");

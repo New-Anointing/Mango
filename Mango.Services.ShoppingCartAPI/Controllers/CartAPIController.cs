@@ -30,46 +30,46 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             //_couponService = couponService;
             //_configuration = configuration;
         }
-        //[HttpGet("GetCart/{userId}")]
-        //public async Task<ResponseDto> GetCart(string userId)
-        //{
-        //    try
-        //    {
-        //        CartDto cart = new()
-        //        {
-        //            CartHeader = _mapper.Map<CartHeaderDto>(_db.CartHeaders.First(u => u.UserId == userId))
-        //        };
-        //        cart.CartDetails = _mapper.Map<IEnumerable<CartDetailsDto>>(_db.CartDetails
-        //            .Where(u => u.CartHeaderId==cart.CartHeader.CartHeaderId));
+        [HttpGet("GetCart/{userId}")]
+        public async Task<ResponseDto> GetCart(string userId)
+        {
+            try
+            {
+                CartDto cart = new()
+                {
+                    CartHeader = _mapper.Map<CartHeaderDto>(_db.CartHeaders.First(u => u.UserId == userId))
+                };
+                cart.CartDetails = _mapper.Map<IEnumerable<CartDetailDto>>(_db.CartDetails
+                    .Where(u => u.CartHeader.CartHeaderId == cart.CartHeader.CartHeaderId));
 
-        //        IEnumerable<ProductDto> productDtos = await _productService.GetProducts();
+                //IEnumerable<ProductDto> productDtos = await _productService.GetProducts();
 
-        //        foreach (var item in cart.CartDetails)
-        //        {
-        //            item.Product = productDtos.FirstOrDefault(u => u.ProductId == item.ProductId);
-        //            cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
-        //        }
+                foreach (var item in cart.CartDetails)
+                {
+                    //item.Product = productDtos.FirstOrDefault(u => u.ProductId == item.ProductId);
+                    cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
+                }
 
-        //        //apply coupon if any
-        //        if (!string.IsNullOrEmpty(cart.CartHeader.CouponCode))
-        //        {
-        //            CouponDto coupon = await _couponService.GetCoupon(cart.CartHeader.CouponCode);
-        //            if (coupon!=null && cart.CartHeader.CartTotal > coupon.MinAmount)
-        //            {
-        //                cart.CartHeader.CartTotal -= coupon.DiscountAmount;
-        //                cart.CartHeader.Discount=coupon.DiscountAmount;
-        //            }
-        //        }
+                ////apply coupon if any
+                //if (!string.IsNullOrEmpty(cart.CartHeader.CouponCode))
+                //{
+                //    CouponDto coupon = await _couponService.GetCoupon(cart.CartHeader.CouponCode);
+                //    if (coupon!=null && cart.CartHeader.CartTotal > coupon.MinAmount)
+                //    {
+                //        cart.CartHeader.CartTotal -= coupon.DiscountAmount;
+                //        cart.CartHeader.Discount=coupon.DiscountAmount;
+                //    }
+                //}
 
-        //        _response.Result=cart;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.Message = ex.Message;
-        //    }
-        //    return _response;
-        //}
+                _response.Data=cart;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+            }
+            return _response;
+        }
 
 
         //[HttpPost("ApplyCoupon")]
@@ -163,34 +163,34 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
 
 
 
-        //[HttpPost("RemoveCart")]
-        //public async Task<ResponseDto> RemoveCart([FromBody] int cartDetailsId)
-        //{
-        //    try
-        //    {
-        //        CartDetails cartDetails = _db.CartDetails
-        //           .First(u => u.CartDetailsId == cartDetailsId);
+        [HttpPost("RemoveCart")]
+        public async Task<ResponseDto> RemoveCart([FromBody] int cartDetailsId)
+        {
+            try
+            {
+                CartDetail cartDetails = _db.CartDetails.Include(x => x.CartHeader)
+                   .First(u => u.CartDetailsId == cartDetailsId);
 
-        //        int totalCountofCartItem = _db.CartDetails.Where(u => u.CartHeaderId == cartDetails.CartHeaderId).Count();
-        //        _db.CartDetails.Remove(cartDetails);
-        //        if (totalCountofCartItem == 1)
-        //        {
-        //            var cartHeaderToRemove = await _db.CartHeaders
-        //               .FirstOrDefaultAsync(u => u.CartHeaderId == cartDetails.CartHeaderId);
+                int totalCountofCartItem = _db.CartDetails.Where(u => u.CartHeader.CartHeaderId == cartDetails.CartHeader.CartHeaderId).Count();
+                _db.CartDetails.Remove(cartDetails);
+                if (totalCountofCartItem == 1)
+                {
+                    var cartHeaderToRemove = await _db.CartHeaders
+                       .FirstOrDefaultAsync(u => u.CartHeaderId == cartDetails.CartHeader.CartHeaderId);
 
-        //            _db.CartHeaders.Remove(cartHeaderToRemove);
-        //        }
-        //        await _db.SaveChangesAsync();
+                    _db.CartHeaders.Remove(cartHeaderToRemove);
+                }
+                await _db.SaveChangesAsync();
 
-        //        _response.Result = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.Message = ex.Message.ToString();
-        //        _response.IsSuccess = false;
-        //    }
-        //    return _response;
-        //}
+                _response.Data = true;
+            }
+            catch (Exception ex)
+            {
+                _response.Message = ex.Message.ToString();
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
 
     }
 }

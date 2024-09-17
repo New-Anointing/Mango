@@ -51,6 +51,10 @@ builder.Services.AddSingleton(mapper);
 //enable DI for auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//Setup HttpClient
+builder.Services.AddHttpClient("Product", u => u.BaseAddress =
+new Uri(builder.Configuration["ServiceUrls:ProductApi"]));
+
 
 builder.AddAppAuthentication();
 builder.Services.AddAuthorization();
